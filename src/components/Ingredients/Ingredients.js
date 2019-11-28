@@ -21,13 +21,16 @@ function Ingredients() {
                 })
             }
 
-            console.log(loadedData);
             setIngredients(loadedData);
         }
 
         fetchData();
 
     }, []);
+
+    useEffect(() => {
+        console.log('RENDER while ingredient changed');
+    },[ingredients]);
 
 
     const addIngredient = async (ingredient) => {
