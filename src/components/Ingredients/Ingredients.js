@@ -33,6 +33,10 @@ function Ingredients() {
     },[ingredients]);
 
 
+    const filteredIngredient = (filteredIngredient) => {
+        setIngredients(filteredIngredient);
+    };
+
     const addIngredient = async (ingredient) => {
 
         // talk to server
@@ -57,7 +61,7 @@ function Ingredients() {
             <IngredientForm onAddIngredient={addIngredient}/>
 
             <section>
-                <Search/>
+                <Search onLoadingIngredient={filteredIngredient}/>
                 <IngredientList ingredients={ingredients} onRemoveItem={() => {
                 }}/>
             </section>
