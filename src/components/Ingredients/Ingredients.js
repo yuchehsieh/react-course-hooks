@@ -2,11 +2,14 @@ import React, {useState, useEffect, useCallback} from 'react';
 
 import IngredientForm from './IngredientForm';
 import IngredientList from "./IngredientList";
+import ErrorModal from "../UI/ErrorModal";
 import Search from './Search';
 
 function Ingredients() {
 
     const [ingredients, setIngredients] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState();
 
     // useEffect(() => {
     //
@@ -39,6 +42,8 @@ function Ingredients() {
 
     const addIngredient = async (ingredient) => {
 
+        setIsLoading(true);
+
         // talk to server
         const response = await fetch('https://react-course-hooks.firebaseio.com/ingredients.json', {
             method: 'POST',
@@ -46,6 +51,7 @@ function Ingredients() {
             headers: {'Content-Type': 'application.json'}
         });
         const responseData = await response.json();
+        setIsLoading(false);
 
         setIngredients(prevIngredients => [
             ...prevIngredients,
@@ -58,18 +64,31 @@ function Ingredients() {
 
     const removeIngredient = async (idToRemove) => {
 
-        await fetch(`https://react-course-hooks.firebaseio.com/ingredients/${idToRemove}.json`, {
-            method: 'DELETE',
-        });
+        setIsLoading(true);
 
-        setIngredients(prevIngredients =>
-            prevIngredients.filter(ig => ig.id !== idToRemove)
-        )
+        try {
+            await fetch(`https://react-course-hooks.firebaseio.com/ingredients/${idToRemove}.json`, {
+                method: 'DELETE',
+            });
+            setIsLoading(false);
+            setIngredients(prevIngredients =>
+                prevIngredients.filter(ig => ig.id !== idToRemove)
+            )
+        } catch (e) {
+            // setIsLoading(false);
+            setError(e.message);
+        }
+    };
+
+    const clearError = () => {
+        setIsLoading(false);
+        setError();
     };
 
     return (
         <div className="App">
-            <IngredientForm onAddIngredient={addIngredient}/>
+            {error && <ErrorModal onClose={clearError}>{error}</ErrorModal>}
+            <IngredientForm onAddIngredient={addIngredient} loading={isLoading}/>
 
             <section>
                 <Search onLoadingIngredient={filteredIngredient}/>
