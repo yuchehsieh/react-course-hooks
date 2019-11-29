@@ -11,7 +11,7 @@ const Search = React.memo(props => {
 
     useEffect(() => {
 
-        setTimeout(() => {
+        const timer = setTimeout(() => {
 
             if(enteredFilter === inputRef.current.value) {
 
@@ -31,6 +31,10 @@ const Search = React.memo(props => {
                 }
 
                 fetchFilteredData();
+            }
+
+            return () => {
+                clearTimeout(timer);
             }
 
         } , 500)
