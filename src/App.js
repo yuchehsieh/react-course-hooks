@@ -8,7 +8,7 @@ const App = props => {
 
   const authContext = useContext(AuthContext);
 
-  let content = <Auth/>
+  let content = <Auth/>;
   if(authContext.isAuth) {
     content = <Ingredients/>;
   }

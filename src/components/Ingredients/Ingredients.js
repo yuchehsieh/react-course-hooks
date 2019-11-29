@@ -1,4 +1,4 @@
-import React, {useEffect, useCallback, useReducer} from 'react';
+import React, {useEffect, useCallback, useReducer, useMemo} from 'react';
 
 import IngredientForm from './IngredientForm';
 import IngredientList from "./IngredientList";
@@ -21,9 +21,9 @@ const ingredientsReducer = (currentIngredients, action) => {
 const httpReducer = (currentHttpState, action) => {
     switch (action.type) {
         case 'SEND':
-            return { loading: true, error: null };
+            return {loading: true, error: null};
         case 'RESPONSE':
-            return { ...currentHttpState, loading: false};
+            return {...currentHttpState, loading: false};
         case 'ERROR':
             return {loading: false, error: action.error};
         case 'CLEAR':
@@ -71,7 +71,7 @@ function Ingredients() {
         dispatch({type: 'SET', ingredients: filteredIngredient})
     }, []);
 
-    const addIngredient = async (ingredient) => {
+    const addIngredient = useCallback(async (ingredient) => {
 
         dispatchHttp({type: 'SEND'});
 
@@ -92,9 +92,10 @@ function Ingredients() {
         //     }]
         // );
         dispatch({type: 'ADD', ingredient: {id: responseData.name, ...ingredient}})
-    };
+    }, []);
 
-    const removeIngredient = async (idToRemove) => {
+
+    const removeIngredient = useCallback(async (idToRemove) => {
 
         dispatchHttp({type: 'SEND'});
 
@@ -112,11 +113,17 @@ function Ingredients() {
             // setError(e.message);
             dispatchHttp({type: 'ERROR', error: e});
         }
-    };
+    }, []);
 
-    const clearError = () => {
+    const clearError = useCallback(() => {
         dispatchHttp({type: 'CLEAR'});
-    };
+    });
+
+    const ingredientList = useMemo(() =>
+            <IngredientList ingredients={ingredients}
+                            onRemoveItem={ingredients}/>,
+        [ingredients, ingredients]
+    );
 
     return (
         <div className="App">
@@ -125,7 +132,7 @@ function Ingredients() {
 
             <section>
                 <Search onLoadingIngredient={filteredIngredient}/>
-                <IngredientList ingredients={ingredients} onRemoveItem={removeIngredient}/>
+                {ingredientList}
             </section>
         </div>
     );
