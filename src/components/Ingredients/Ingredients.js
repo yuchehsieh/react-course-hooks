@@ -56,14 +56,24 @@ function Ingredients() {
         );
     };
 
+    const removeIngredient = async (idToRemove) => {
+
+        await fetch(`https://react-course-hooks.firebaseio.com/ingredients/${idToRemove}.json`, {
+            method: 'DELETE',
+        });
+
+        setIngredients(prevIngredients =>
+            prevIngredients.filter(ig => ig.id !== idToRemove)
+        )
+    };
+
     return (
         <div className="App">
             <IngredientForm onAddIngredient={addIngredient}/>
 
             <section>
                 <Search onLoadingIngredient={filteredIngredient}/>
-                <IngredientList ingredients={ingredients} onRemoveItem={() => {
-                }}/>
+                <IngredientList ingredients={ingredients} onRemoveItem={removeIngredient}/>
             </section>
         </div>
     );
