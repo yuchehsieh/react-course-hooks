@@ -21,7 +21,7 @@ const Search = React.memo(props => {
                 })
             }
 
-            // onLoadingIngredient(loadedData);
+            onLoadingIngredient(loadedData);
         }
 
         fetchFilteredData();
