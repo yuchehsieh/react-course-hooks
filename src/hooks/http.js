@@ -1,5 +1,13 @@
 import {useReducer, useCallback} from 'react';
 
+const initialState = {
+    loading: false,
+    error: null,
+    data: null,
+    extra: null,
+    identifier: null
+};
+
 const httpReducer = (currentHttpState, action) => {
     switch (action.type) {
         case 'SEND':
@@ -9,19 +17,19 @@ const httpReducer = (currentHttpState, action) => {
         case 'ERROR':
             return {loading: false, error: action.error};
         case 'CLEAR':
-            return {...currentHttpState, error: null};
+            return initialState;
         default:
             throw new Error('Should not be reached');
     }
 };
 
 const useHttp = () => {
-    const [httpState, dispatchHttp] = useReducer(httpReducer,
-        {loading: false, error: null, data: null, extra: null, identifier: null}
-    );
+    const [httpState, dispatchHttp] = useReducer(httpReducer, initialState);
+
+    const clear = useCallback(() => dispatchHttp({ type: 'CLEAR' }), []);
 
     const sendRequest = useCallback(async (url, method, body, extra, identifier) => {
-        dispatchHttp({type: 'SEND', identifier: identifier });
+        dispatchHttp({type: 'SEND', identifier: identifier});
         try {
             const response = await fetch(url, {
                 method: method,
@@ -33,7 +41,7 @@ const useHttp = () => {
             const responseData = await response.json();
             dispatchHttp({type: 'RESPONSE', responseData: responseData, extra: extra});
         } catch (e) {
-            dispatchHttp({type: 'ERROR', error: e});
+            dispatchHttp({type: 'ERROR', error: 'Terrible Fail!!'});
         }
     }, []);
 
@@ -43,7 +51,8 @@ const useHttp = () => {
         data: httpState.data,
         sendRequest: sendRequest,
         reqExtra: httpState.extra,
-        reqIdentifier: httpState.identifier
+        reqIdentifier: httpState.identifier,
+        clear: clear
     }
 };
 
